@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { breedPets } from '../store/petSlice';
-import { ethers } from 'ethers';
+import { RootState } from '../store/store';
 import PetCard from '../components/PetCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { RootState } from '../store/store';
+import ErrorMessage from '../components/ErrorMessage';
 
-interface BreedPetPageProps {
-  contract: ethers.Contract | null;
-}
+interface BreedPetPageProps {}
 
-const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
-  const { pets, loading, error } = useSelector((state: RootState) => state.pet);
-  const { account } = useSelector((state: RootState) => state.web3);
+const BreedPetPage: React.FC<BreedPetPageProps> = () => {
+  const { pets, loading, error, breeding } = useSelector((state: RootState) => state.pet);
+  const { account, contract } = useSelector((state: RootState) => state.web3);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -21,7 +19,6 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
   const [selectedPet2, setSelectedPet2] = useState<number | null>(null);
   const [breedingError, setBreedingError] = useState<string | null>(null);
   const [breedingSuccess, setBreedingSuccess] = useState<string | null>(null);
-  const [isBreeding, setIsBreeding] = useState(false);
 
   // 检查宠物是否可以繁殖
   const canBreed = (petId: number) => {
@@ -56,7 +53,6 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
     }
 
     try {
-      setIsBreeding(true);
       setBreedingError(null);
       setBreedingSuccess(null);
 
@@ -78,8 +74,6 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
       }
     } catch (err: any) {
       setBreedingError(err.message);
-    } finally {
-      setIsBreeding(false);
     }
   };
 
@@ -133,15 +127,11 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
       )}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <strong>错误:</strong> {error}
-        </div>
+        <ErrorMessage message={error} />
       )}
       
       {breedingError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <strong>繁殖错误:</strong> {breedingError}
-        </div>
+        <ErrorMessage message={breedingError} />
       )}
       
       {breedingSuccess && (
@@ -160,10 +150,10 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
         <div className="bg-white rounded-xl p-6 text-center">
           <p className="text-gray-500 mb-4">你还没有任何宠物。请先领养或购买宠物。</p>
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/adopt')} 
             className="btn-primary"
           >
-            返回首页
+            领养宠物
           </button>
         </div>
       ) : (
@@ -189,9 +179,9 @@ const BreedPetPage: React.FC<BreedPetPageProps> = ({ contract }) => {
           <button 
             onClick={handleBreedSubmit} 
             className="btn-secondary px-8 py-3 text-lg"
-            disabled={isBreeding}
+            disabled={breeding}
           >
-            {isBreeding ? (
+            {breeding ? (
               <>
                 <i className="fa fa-spinner fa-spin mr-2"></i>繁殖中...
               </>
