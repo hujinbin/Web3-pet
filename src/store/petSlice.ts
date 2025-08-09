@@ -1,5 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // 宠物接口定义
 export interface Pet {
@@ -20,9 +19,9 @@ export interface Pet {
 // 获取单个宠物信息
 export const getPetInfo = createAsyncThunk(
   'pet/getPetInfo',
-  async ({ contract, petId }: { contract: ethers.Contract; petId: number }) => {
+  async ({ contract, petId }: { contract: any; petId: number }) => {
     try {
-      const petData = await contract.getPetInfo(petId);
+      const petData = await contract.methods.getPetInfo(petId).call();
       
       // 格式化宠物数据
       const pet: Pet = {
@@ -36,7 +35,8 @@ export const getPetInfo = createAsyncThunk(
         lastBreedTime: parseInt(petData.lastBreedTime.toString()),
         canBreed: petData.canBreed,
         owner: petData.owner,
-        dna: petData.dna.toString()
+        dna: petData.dna.toString(),
+        imageUrl: `https://picsum.photos/seed/pet${petId}/200/200`
       };
       
       return pet;
@@ -51,7 +51,7 @@ export const getPetInfo = createAsyncThunk(
 export const fetchUserPets = createAsyncThunk(
   'pet/fetchUserPets',
   async (_, { getState }) => {
-    const state = getState() as RootState;
+    const state = getState() as any;
     const { contract, account } = state.web3;
     
     if (!contract || !account) {
@@ -98,7 +98,7 @@ export const fetchUserPets = createAsyncThunk(
 export const adoptPet = createAsyncThunk(
   'pet/adoptPet',
   async (name: string, { getState, dispatch }) => {
-    const state = getState() as RootState;
+    const state = getState() as any;
     const { contract, account, web3 } = state.web3;
     
     if (!contract || !account || !web3) {
@@ -133,7 +133,7 @@ export const adoptPet = createAsyncThunk(
 export const breedPets = createAsyncThunk(
   'pet/breedPets',
   async ({ petId1, petId2 }: { petId1: number, petId2: number }, { getState, dispatch }) => {
-    const state = getState() as RootState;
+    const state = getState() as any;
     const { contract, account, web3 } = state.web3;
     
     if (!contract || !account || !web3) {
@@ -167,6 +167,7 @@ export const breedPets = createAsyncThunk(
 // 初始状态
 interface PetState {
   pets: Pet[];
+  pet: Pet | null;
   loading: boolean;
   error: string | null;
   breeding: boolean;
@@ -175,6 +176,7 @@ interface PetState {
 
 const initialState: PetState = {
   pets: [],
+  pet: null,
   loading: false,
   error: null,
   breeding: false,
@@ -188,6 +190,18 @@ const petSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(getPetInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPetInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.pet = action.payload;
+      })
+      .addCase(getPetInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || '获取宠物信息失败';
+      })
       .addCase(fetchUserPets.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -225,4 +239,4 @@ const petSlice = createSlice({
   }
 });
 
-export default petSlice.reducer;    
+export default petSlice.reducer;

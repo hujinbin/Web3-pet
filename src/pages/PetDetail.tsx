@@ -66,7 +66,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       return;
     }
     
-    if (!ethers.utils.isAddress(transferAddress)) {
+    if (!ethers.isAddress(transferAddress)) {
       setTransferError('无效的以太坊地址');
       return;
     }
@@ -346,4 +346,4 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
   );
 };
 
-export default PetDetail;    
+export default PetDetail;

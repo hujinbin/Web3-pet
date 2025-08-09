@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Web3 from 'web3';
 import petABI from '../abis/PetABI.json';
 
@@ -59,7 +59,7 @@ export const getAccount = createAsyncThunk(
 export const connectContract = createAsyncThunk(
   'web3/connectContract',
   async (contractAddress: string, { getState }) => {
-    const state = getState() as RootState;
+    const state = getState() as any;
     const { web3 } = state.web3;
     
     if (!web3) {
@@ -79,7 +79,7 @@ export const connectContract = createAsyncThunk(
 export const getBalance = createAsyncThunk(
   'web3/getBalance',
   async (_, { getState }) => {
-    const state = getState() as RootState;
+    const state = getState() as any;
     const { web3, account } = state.web3;
     
     if (!web3 || !account) {
@@ -185,4 +185,4 @@ const web3Slice = createSlice({
 });
 
 export const { disconnect } = web3Slice.actions;
-export default web3Slice.reducer;    
+export default web3Slice.reducer;
