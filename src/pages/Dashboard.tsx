@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserPets } from '../store/petSlice';
 import { connectContract } from '../store/web3Slice';
-import { RootState } from '../store/store';
+import type { RootState } from '../store/store';
 import PetCard from '../components/PetCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -95,4 +95,4 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
   );
 };
 
-export default DashboardPage;    
+export default DashboardPage;
