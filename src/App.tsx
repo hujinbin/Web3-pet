@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from './store/store';
+import type { RootState } from './store/store';
 import Dashboard from './pages/Dashboard';
 import PetDetail from './pages/PetDetail';
 import BreedPet from './pages/BreedPet';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { breedPets } from '../store/petSlice';
-import { RootState } from '../store/store';
+import type { RootState } from '../store/store';
 import PetCard from '../components/PetCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';

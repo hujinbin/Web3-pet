@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { ethers } from 'ethers';
 import { getPetInfo } from '../store/petSlice';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
-import { RootState } from '../store/store';
+import type { RootState } from '../store/store';
 
 interface PetDetailPageProps {
-  contract: ethers.Contract | null;
+  contract: any; // 使用web3合约类型
 }
 
 const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
@@ -19,7 +18,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
   const navigate = useNavigate();
   
   const { pet, loading, error } = useSelector((state: RootState) => state.pet);
-  const { account } = useSelector((state: RootState) => state.web3);
+  const { account, web3 } = useSelector((state: RootState) => state.web3);
   
   const [isTransferring, setIsTransferring] = useState(false);
   const [transferAddress, setTransferAddress] = useState('');
@@ -56,7 +55,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
 
   // 处理宠物转移
   const handleTransfer = async () => {
-    if (!contract || !petId || !account) {
+    if (!contract || !petId || !account || !web3) {
       setTransferError('请先连接钱包');
       return;
     }
@@ -66,7 +65,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       return;
     }
     
-    if (!ethers.isAddress(transferAddress)) {
+    if (!web3.utils.isAddress(transferAddress)) {
       setTransferError('无效的以太坊地址');
       return;
     }
@@ -77,13 +76,12 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       setTransferSuccess('');
       
       // 调用智能合约的transferFrom方法
-      const tx = await contract.transferFrom(
+      const tx = await contract.methods.transferFrom(
         account,
         transferAddress,
         parseInt(petId)
-      );
+      ).send({ from: account });
       
-      await tx.wait();
       setTransferSuccess('宠物转移成功！');
       
       // 3秒后返回宠物列表
@@ -92,7 +90,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       }, 3000);
     } catch (error: any) {
       console.error('转移失败:', error);
-      if (error.message.includes('User denied transaction signature')) {
+      if (error.message && error.message.includes('User denied transaction signature')) {
         setTransferError('用户拒绝了交易签名');
       } else {
         setTransferError('转移失败: ' + error.message);
