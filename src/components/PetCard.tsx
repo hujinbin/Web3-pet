@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card, Typography, Tag, Space, Button, Statistic, Row, Col } from 'antd';
+import { HeartOutlined, ThunderboltOutlined, CalendarOutlined, IdcardOutlined } from '@ant-design/icons';
 
 interface PetCardProps {
   pet: any;
@@ -29,69 +31,106 @@ const PetCard: React.FC<PetCardProps> = ({ pet, onBreed, showActions = false }) 
     dragon: 'fa-dragon'
   };
   
+  const { Title, Text } = Typography;
+
+  // 根据稀有度设置颜色
+  const rarityTagColors: { [key: string]: string } = {
+    common: 'default',
+    uncommon: 'green',
+    rare: 'blue',
+    epic: 'purple',
+    legendary: 'gold'
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl">
-      <div className="relative">
-        <img 
-          src={pet.imageUrl} 
-          alt={`宠物 ${pet.name}`} 
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full px-3 py-1 text-sm font-medium">
-          <i className={`fa ${typeIcons[pet.type] || 'fa-paw'} mr-1`}></i>
-          {pet.type}
+    <Card
+      hoverable
+      cover={
+        <div style={{ position: 'relative' }}>
+          <img 
+            src={pet.imageUrl} 
+            alt={`宠物 ${pet.name}`} 
+            style={{ width: '100%', height: 200, objectFit: 'cover' }}
+          />
+          <Tag color="white" style={{ 
+            position: 'absolute', 
+            top: 8, 
+            right: 8, 
+            background: 'rgba(255, 255, 255, 0.8)'
+          }}>
+            {pet.type}
+          </Tag>
         </div>
+      }
+      actions={showActions ? [
+        <Link to={`/pet/${pet.id}`} key="details">
+          <Button type="link">查看详情</Button>
+        </Link>,
+        pet.canBreed && (
+          <Button 
+            type="link" 
+            onClick={onBreed} 
+            key="breed"
+            icon={<HeartOutlined />}
+          >
+            繁殖
+          </Button>
+        )
+      ].filter(Boolean) : [
+        <Link to={`/pet/${pet.id}`} key="details">
+          <Button type="link">查看详情</Button>
+        </Link>
+      ]}
+    >
+      <div style={{ marginBottom: 12 }}>
+        <Row justify="space-between" align="middle">
+          <Col>
+            <Title level={4} style={{ margin: 0 }}>{pet.name}</Title>
+          </Col>
+          <Col>
+            <Tag color={rarityTagColors[pet.rarity] || 'default'}>
+              {pet.rarity.charAt(0).toUpperCase() + pet.rarity.slice(1)}
+            </Tag>
+          </Col>
+        </Row>
       </div>
       
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-bold text-lg">{pet.name}</h3>
-          <span className={`text-xs font-medium ${rarityColors[pet.rarity] || 'text-gray-600'}`}>
-            {pet.rarity.charAt(0).toUpperCase() + pet.rarity.slice(1)}
-          </span>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-2 text-sm mb-4">
-          <div className="flex items-center">
-            <i className="fa fa-bolt text-yellow-500 mr-1"></i>
-            <span>等级: {pet.level}</span>
-          </div>
-          <div className="flex items-center">
-            <i className="fa fa-calendar text-blue-500 mr-1"></i>
-            <span>年龄: {ageInDays}天</span>
-          </div>
-          <div className="flex items-center">
-            <i className="fa fa-id-card text-purple-500 mr-1"></i>
-            <span>ID: #{pet.id}</span>
-          </div>
-          <div className="flex items-center">
-            <i className="fa fa-heart text-red-500 mr-1"></i>
-            <span>可繁殖: {pet.canBreed ? '是' : '否'}</span>
-          </div>
-        </div>
-        
-        {showActions ? (
-          <div className="flex space-x-2">
-            <Link to={`/pet/${pet.id}`} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-2 px-4 rounded-lg transition-all duration-300">
-              查看详情
-            </Link>
-            {pet.canBreed && (
-              <button 
-                onClick={onBreed} 
-                className="flex-1 bg-primary hover:bg-primary/90 text-white text-center py-2 px-4 rounded-lg transition-all duration-300"
-              >
-                繁殖
-              </button>
-            )}
-          </div>
-        ) : (
-          <Link to={`/pet/${pet.id}`} className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center py-2 px-4 rounded-lg transition-all duration-300">
-            查看详情
-          </Link>
-        )}
-      </div>
-    </div>
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
+          <Statistic 
+            title="等级" 
+            value={pet.level} 
+            prefix={<ThunderboltOutlined style={{ color: '#faad14' }} />} 
+            valueStyle={{ fontSize: '14px' }}
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic 
+            title="年龄" 
+            value={`${ageInDays}天`} 
+            prefix={<CalendarOutlined style={{ color: '#1890ff' }} />} 
+            valueStyle={{ fontSize: '14px' }}
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic 
+            title="ID" 
+            value={`#${pet.id}`} 
+            prefix={<IdcardOutlined style={{ color: '#722ed1' }} />} 
+            valueStyle={{ fontSize: '14px' }}
+          />
+        </Col>
+        <Col span={12}>
+          <Statistic 
+            title="可繁殖" 
+            value={pet.canBreed ? '是' : '否'} 
+            prefix={<HeartOutlined style={{ color: '#f5222d' }} />} 
+            valueStyle={{ fontSize: '14px' }}
+          />
+        </Col>
+      </Row>
+    </Card>
   );
 };
 
-export default PetCard;    
+export default PetCard;

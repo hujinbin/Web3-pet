@@ -7,6 +7,8 @@ import PetCard from '../components/PetCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
+import { Row, Col, Typography, Button, Card, Empty, Spin, Alert } from 'antd';
+import { PlusOutlined, HeartOutlined } from '@ant-design/icons';
 
 // 合约地址（需要替换为实际部署的合约地址）
 const CONTRACT_ADDRESS = '0xYourContractAddress';
@@ -30,67 +32,77 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
     }
   }, [contract, account, dispatch]);
 
+  const { Title, Paragraph } = Typography;
+
   return (
-    <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <div>
-          <h2 className="text-2xl font-bold mb-2 text-primary">你的宠物</h2>
-          <p className="text-gray-600">管理和培育你的数字宠物</p>
-        </div>
-        <div className="mt-4 md:mt-0">
+    <div style={{ padding: '24px' }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col>
+          <Title level={2} style={{ marginBottom: 8 }}>你的宠物</Title>
+          <Paragraph type="secondary">管理和培育你的数字宠物</Paragraph>
+        </Col>
+        <Col>
           <Link to="/adopt">
-            <button className="btn-accent flex items-center">
-              <i className="fa fa-plus mr-2"></i>领养新宠物
-            </button>
+            <Button type="primary" icon={<PlusOutlined />} size="large">
+              领养新宠物
+            </Button>
           </Link>
-        </div>
-      </div>
+        </Col>
+      </Row>
       
       {loading && (
-        <div className="flex justify-center my-8">
-          <LoadingSpinner />
+        <div style={{ textAlign: 'center', margin: '40px 0' }}>
+          <Spin size="large" />
         </div>
       )}
       
       {error && (
-        <ErrorMessage message={error} />
+        <Alert message="错误" description={error} type="error" showIcon style={{ marginBottom: 24 }} />
       )}
       
-      {pets.length === 0 ? (
-        <div className="bg-white rounded-xl p-8 text-center">
-          <div className="mb-4 text-6xl text-gray-300">
-            <i className="fa fa-paw"></i>
-          </div>
-          <h3 className="text-xl font-bold mb-2">还没有宠物</h3>
-          <p className="text-gray-600 mb-6">点击下方按钮领养你的第一只宠物</p>
-          <Link to="/adopt">
-            <button className="btn-accent px-8 py-3">
-              <i className="fa fa-heart mr-2"></i>领养宠物
-            </button>
-          </Link>
-        </div>
+      {!loading && pets.length === 0 ? (
+        <Card style={{ textAlign: 'center', padding: 24 }}>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <span>
+                <Title level={4}>还没有宠物</Title>
+                <Paragraph type="secondary">点击下方按钮领养你的第一只宠物</Paragraph>
+              </span>
+            }
+          >
+            <Link to="/adopt">
+              <Button type="primary" icon={<HeartOutlined />} size="large">
+                领养宠物
+              </Button>
+            </Link>
+          </Empty>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <Row gutter={[24, 24]}>
           {pets.map(pet => (
-            <PetCard 
-              key={pet.id} 
-              pet={pet} 
-              onBreed={() => {}}
-              showActions={true}
-            />
+            <Col xs={24} sm={12} lg={8} xl={6} key={pet.id}>
+              <PetCard 
+                pet={pet} 
+                onBreed={() => {}}
+                showActions={true}
+              />
+            </Col>
           ))}
-        </div>
+        </Row>
       )}
       
-      <div className="mt-12 bg-white rounded-xl p-6 shadow-md">
-        <h3 className="font-bold text-xl mb-4 text-primary">宠物繁殖中心</h3>
-        <p className="text-gray-600 mb-4">使用两只宠物进行繁殖，创造独特的后代。繁殖需要支付少量ETH作为手续费。</p>
+      <Card style={{ marginTop: 48 }}>
+        <Title level={3}>宠物繁殖中心</Title>
+        <Paragraph type="secondary">
+          使用两只宠物进行繁殖，创造独特的后代。繁殖需要支付少量ETH作为手续费。
+        </Paragraph>
         <Link to="/breed">
-          <button className="btn-secondary">
-            <i className="fa fa-heart mr-2"></i>前往繁殖中心
-          </button>
+          <Button type="default" icon={<HeartOutlined />}>
+            前往繁殖中心
+          </Button>
         </Link>
-      </div>
+      </Card>
     </div>
   );
 };
