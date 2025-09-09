@@ -1,55 +1,103 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
+import { Layout, Menu, Button, Typography, Avatar, Drawer, Space, Grid } from 'antd';
+import { HomeOutlined, HeartOutlined, ShoppingOutlined, UserOutlined, MenuOutlined, WalletOutlined } from '@ant-design/icons';
 
 const Navbar: React.FC = () => {
   const { account } = useSelector((state: RootState) => state.web3);
+  const [visible, setVisible] = useState(false);
+  const { Header } = Layout;
+  const { Title, Text } = Typography;
+  const { useBreakpoint } = Grid;  
+  const screens = useBreakpoint();
+
+  const showDrawer = () => {
+    setVisible(true);
+  };
+
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const menuItems = [
+    { key: 'home', icon: <HomeOutlined />, label: '首页', link: '/' },
+    { key: 'pets', icon: <UserOutlined />, label: '我的宠物', link: '/pets' },
+    { key: 'breed', icon: <HeartOutlined />, label: '繁殖中心', link: '/breed' },
+    { key: 'marketplace', icon: <ShoppingOutlined />, label: '市场', link: '/marketplace' },
+  ];
 
   return (
-    <nav className="bg-white shadow-md fixed w-full z-50 transition-all duration-300" 
-         style={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <div className="text-primary text-2xl font-bold">Web3 Pet World</div>
-        </div>
+    <Header style={{ 
+      position: 'sticky', 
+      top: 0, 
+      zIndex: 1, 
+      width: '100%', 
+      background: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      padding: '0 24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Title level={3} style={{ margin: 0, color: '#1890ff' }}>Web3 Pet World</Title>
+      </div>
+      
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {screens.md ? (
+          <Menu 
+            mode="horizontal" 
+            style={{ border: 'none', background: 'transparent' }}
+            items={menuItems.map(item => ({
+              key: item.key,
+              icon: item.icon,
+              label: <Link to={item.link}>{item.label}</Link>
+            }))}
+          />
+        ) : null}
         
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
-            <i className="fa fa-home mr-1"></i> 首页
-          </Link>
-          <Link to="/pets" className="text-gray-700 hover:text-primary transition-colors">
-            <i className="fa fa-paw mr-1"></i> 我的宠物
-          </Link>
-          <Link to="/breed" className="text-gray-700 hover:text-primary transition-colors">
-            <i className="fa fa-heart mr-1"></i> 繁殖中心
-          </Link>
-          <Link to="/marketplace" className="text-gray-700 hover:text-primary transition-colors">
-            <i className="fa fa-shopping-bag mr-1"></i> 市场
-          </Link>
-        </div>
-        
-        <div className="flex items-center space-x-4">
+        <Space size={16}>
           {account ? (
-            <div className="flex items-center">
-              <div className="bg-gray-100 px-4 py-2 rounded-full text-sm flex items-center">
-                <i className="fa fa-user-circle text-primary mr-2"></i>
-                <span className="truncate max-w-[120px]">{account}</span>
-              </div>
-            </div>
+            <Button type="text" icon={<UserOutlined />} style={{ display: 'flex', alignItems: 'center' }}>
+              <Text ellipsis style={{ maxWidth: 120 }}>{account}</Text>
+            </Button>
           ) : (
-            <Link to="/connect" className="btn-primary">
-              <i className="fa fa-wallet mr-2"></i> 连接钱包
+            <Link to="/connect">
+              <Button type="primary" icon={<WalletOutlined />}>连接钱包</Button>
             </Link>
           )}
           
-          <button className="md:hidden text-gray-700 focus:outline-none">
-            <i className="fa fa-bars text-xl"></i>
-          </button>
-        </div>
+          {!screens.md && (
+            <Button 
+              type="text" 
+              icon={<MenuOutlined />} 
+              onClick={showDrawer}
+            />
+          )}
+        </Space>
       </div>
-    </nav>
+      
+      <Drawer 
+        title="菜单" 
+        placement="right" 
+        onClose={onClose} 
+        open={visible}
+      >
+        <Menu 
+          mode="vertical"
+          items={menuItems.map(item => ({
+            key: item.key,
+            icon: item.icon,
+            label: <Link to={item.link}>{item.label}</Link>,
+            onClick: onClose
+          }))}
+        />
+      </Drawer>
+    </Header>
   );
 };
 
-export default Navbar;    
+export default Navbar;

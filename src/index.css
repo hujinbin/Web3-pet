@@ -1,51 +1,45 @@
+/* 如果 Google Fonts 加载失败，使用系统字体 */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 body {
   font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 .gradient-bg {
   background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf5 100%);
 }
 
-.pet-card {
-  @apply bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl;
+/* 全局容器样式 */
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.btn-primary {
-  @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50;
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.btn-secondary {
-  @apply bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary/50;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.btn-accent {
-  @apply bg-accent hover:bg-accent/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent/50;
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
 }
 
-.eth-address {
-  @apply bg-gray-100 px-3 py-1 rounded-full text-xs font-medium text-gray-700;
-}
-
-.rarity-common {
-  @apply text-gray-600;
-}
-
-.rarity-uncommon {
-  @apply text-green-600;
-}
-
-.rarity-rare {
-  @apply text-blue-600;
-}
-
-.rarity-epic {
-  @apply text-purple-600;
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .rarity-legendary {

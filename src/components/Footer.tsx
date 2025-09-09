@@ -1,65 +1,70 @@
 import React from 'react';
+import { Layout, Row, Col, Typography, Space, Divider } from 'antd';
+import { TwitterOutlined, GithubOutlined, LinkedinOutlined, MediumOutlined } from '@ant-design/icons';
 
 const Footer: React.FC = () => {
+  const { Footer } = Layout;
+  const { Title, Text, Link: TextLink } = Typography;
+
   return (
-    <footer className="bg-dark text-white py-12 mt-20">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-xl font-bold mb-4">Web3 Pet World</h3>
-            <p className="text-gray-400">
-              拥有、繁殖和饲养区块链上的独特数字宠物
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">快速链接</h3>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">首页</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">我的宠物</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">繁殖中心</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">市场</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">资源</h3>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">帮助中心</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">开发者文档</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">社区论坛</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">白皮书</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">联系我们</h3>
-            <div className="flex space-x-4 mb-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa fa-twitter text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa fa-telegram text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa fa-discord text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa fa-medium text-xl"></i>
-              </a>
-            </div>
-            <p className="text-gray-400">
-              邮箱: contact@web3petworld.com
-            </p>
-          </div>
-        </div>
+    <Footer style={{ background: '#001529', padding: '48px 24px 24px', marginTop: 60 }}>
+      <Row gutter={[48, 32]}>
+        <Col xs={24} sm={24} md={6} lg={6}>
+          <Title level={4} style={{ color: '#fff', marginBottom: 16 }}>Web3 Pet World</Title>
+          <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
+            拥有、繁殖和饲养区块链上的独特数字宠物
+          </Text>
+        </Col>
         
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
-          <p>&copy; 2025 Web3 Pet World. 保留所有权利。</p>
-        </div>
+        <Col xs={24} sm={12} md={6} lg={6}>
+          <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>快速链接</Title>
+          <Space direction="vertical" size="small">
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="/">首页</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="/pets">我的宠物</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="/breed">繁殖中心</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="/marketplace">市场</TextLink>
+          </Space>
+        </Col>
+        
+        <Col xs={24} sm={12} md={6} lg={6}>
+          <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>资源</Title>
+          <Space direction="vertical" size="small">
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="#">帮助中心</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="#">开发者文档</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="#">社区论坛</TextLink>
+            <TextLink style={{ color: 'rgba(255, 255, 255, 0.65)' }} href="#">白皮书</TextLink>
+          </Space>
+        </Col>
+        
+        <Col xs={24} sm={24} md={6} lg={6}>
+          <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>联系我们</Title>
+          <Space size="middle" style={{ marginBottom: 16 }}>
+            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 20 }}>
+              <TwitterOutlined />
+            </a>
+            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 20 }}>
+              <GithubOutlined />
+            </a>
+            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 20 }}>
+              <LinkedinOutlined />
+            </a>
+            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 20 }}>
+              <MediumOutlined />
+            </a>
+          </Space>
+          <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
+            邮箱: contact@web3petworld.com
+          </Text>
+        </Col>
+      </Row>
+      
+      <Divider style={{ borderColor: 'rgba(255, 255, 255, 0.1)', margin: '24px 0' }} />
+      
+      <div style={{ textAlign: 'center' }}>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.45)' }}>&copy; 2025 Web3 Pet World. 保留所有权利。</Text>
       </div>
-    </footer>
+    </Footer>
   );
 };
 
-export default Footer;    
+export default Footer;
