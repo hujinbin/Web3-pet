@@ -97,26 +97,32 @@ export const fetchUserPets = createAsyncThunk(
 // 领养新宠物
 export const adoptPet = createAsyncThunk(
   'pet/adoptPet',
-  async (name: string, { getState, dispatch }) => {
+  async ({ name, petType }: { name: string, petType: string }, { getState, dispatch }) => {
     const state = getState() as any;
-    const { contract, account, web3 } = state.web3;
+    const { account, petAdoptionContract, petCoinContract } = state.web3;
     
-    if (!contract || !account || !web3) {
+    if (!petAdoptionContract || !account || !petCoinContract) {
       throw new Error('未连接合约或账户');
     }
     
     try {
       // 获取领养费用
-      const adoptionFee = await contract.methods.adoptionFee().call();
+      const adoptionFee = await petAdoptionContract.methods.getAdoptionFee().call();
+      
+      // 检查用户金币余额
+      const coinBalance = await petCoinContract.methods.getBalance(account).call();
+      if (Number(coinBalance) < Number(adoptionFee)) {
+        throw new Error(`金币不足，领养需要 ${adoptionFee} 金币，当前余额 ${coinBalance} 金币`);
+      }
       
       // 发送领养交易
-      const tx = await contract.methods.adoptPet(name).send({
-        from: account,
-        value: adoptionFee
+      const tx = await petAdoptionContract.methods.adoptPet(name, petType).send({
+        from: account
       });
       
-      // 交易成功后刷新宠物列表
+      // 交易成功后刷新宠物列表和金币余额
       dispatch(fetchUserPets());
+      dispatch({ type: 'web3/getPetCoinBalance' });
       
       return {
         success: true,

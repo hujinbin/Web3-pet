@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { adoptPet } from '../store/petSlice';
 import type { RootState } from '../store/store';
@@ -18,7 +18,10 @@ import {
   Space,
   Divider,
   Steps,
-  Radio
+  Radio,
+  Modal,
+  Tooltip,
+  Badge
 } from 'antd';
 import { 
   HeartOutlined, 
@@ -26,22 +29,42 @@ import {
   GiftOutlined, 
   StarOutlined,
   ThunderboltOutlined,
-  SafetyOutlined
+  SafetyOutlined,
+  GoldOutlined,
+  QuestionCircleOutlined
 } from '@ant-design/icons';
+import CoinDisplay from '../components/CoinDisplay';
 
 interface AdoptPetPageProps {}
 
 const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
   const { loading, error, adopting } = useSelector((state: RootState) => state.pet);
-  const { account, contract } = useSelector((state: RootState) => state.web3);
+  const { account, contract, petCoinContract, petCoinBalance } = useSelector((state: RootState) => state.web3);
   const dispatch = useDispatch();
   
   const [petName, setPetName] = useState('');
   const [petType, setPetType] = useState('dog');
   const [adoptionSuccess, setAdoptionSuccess] = useState(false);
   const [form] = Form.useForm();
+  const [adoptionFee, setAdoptionFee] = useState<string>('0');
 
   const { Title, Paragraph, Text } = Typography;
+
+  // 获取领养费用
+  useEffect(() => {
+    if (contract) {
+      const getAdoptionFee = async () => {
+        try {
+          const fee = await contract.methods.getAdoptionFee().call();
+          setAdoptionFee(fee);
+        } catch (error) {
+          console.error('获取领养费用失败:', error);
+        }
+      };
+      
+      getAdoptionFee();
+    }
+  }, [contract]);
 
   // 宠物类型选项
   const petTypes = [
@@ -62,7 +85,7 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
     }
 
     try {
-      await dispatch(adoptPet(petName));
+      await dispatch(adoptPet({ name: petName.trim(), petType }));
       setAdoptionSuccess(true);
       setPetName('');
       form.resetFields();
@@ -89,8 +112,8 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
     },
     {
       title: '确认领养',
-      description: '支付少量ETH完成领养',
-      icon: <HeartOutlined />
+      description: `需要 ${adoptionFee} 金币`,
+      icon: <GoldOutlined />
     }
   ];
 
@@ -169,6 +192,27 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
                 onFinish={handleAdopt}
                 initialValues={{ petType: 'dog' }}
               >
+                {/* 金币余额显示 */}
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <Text strong>领养费用: </Text>
+                    <Text type="warning" style={{ fontSize: '16px' }}>
+                      {adoptionFee} <GoldOutlined style={{ color: '#FFD700' }} />
+                    </Text>
+                  </div>
+                  <div>
+                    <Text strong>我的金币: </Text>
+                    <Text style={{ fontSize: '16px', color: Number(petCoinBalance) < Number(adoptionFee) ? '#ff4d4f' : '#52c41a' }}>
+                      {petCoinBalance} <GoldOutlined style={{ color: '#FFD700' }} />
+                    </Text>
+                    {Number(petCoinBalance) < Number(adoptionFee) && (
+                      <Tooltip title="金币不足，请先签到获取金币">
+                        <QuestionCircleOutlined style={{ marginLeft: '5px', color: '#ff4d4f' }} />
+                      </Tooltip>
+                    )}
+                  </div>
+                </div>
+                
                 {/* 宠物类型选择 */}
                 <Form.Item
                   label="选择宠物类型"
@@ -260,6 +304,23 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
                     type="warning"
                     showIcon
                     style={{ marginTop: '16px' }}
+                  />
+                )}
+
+                {Number(petCoinBalance) < Number(adoptionFee) && account && (
+                  <Alert
+                    message="金币不足"
+                    description={
+                      <span>
+                        领养宠物需要 {adoptionFee} 金币，当前余额 {petCoinBalance} 金币。
+                        <Button type="link" href="/daily-signin" style={{ padding: 0 }}>
+                          去签到获取金币 →
+                        </Button>
+                      </span>
+                    }
+                    type="error"
+                    showIcon
+                    style={{ marginTop: '16px', marginBottom: '16px' }}
                   />
                 )}
               </Form>

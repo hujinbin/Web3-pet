@@ -1,6 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Web3 from 'web3';
 import petABI from '../abis/PetABI.json';
+import petCoinABI from '../abis/PetCoinABI.json';
+import petAdoptionABI from '../abis/PetAdoptionABI.json';
+import petBreedingABI from '../abis/PetBreedingABI.json';
 
 // 初始化web3
 let web3: Web3 | null = null;
@@ -75,6 +78,46 @@ export const connectContract = createAsyncThunk(
   }
 );
 
+// 连接PetCoin合约
+export const connectPetCoinContract = createAsyncThunk(
+  'web3/connectPetCoinContract',
+  async (contractAddress: string, { getState }) => {
+    const state = getState() as any;
+    const { web3 } = state.web3;
+    
+    if (!web3) {
+      throw new Error('Web3未初始化');
+    }
+    
+    try {
+      const contract = new web3.eth.Contract(petCoinABI as any, contractAddress);
+      return contract;
+    } catch (error) {
+      throw new Error('无法连接到PetCoin合约');
+    }
+  }
+);
+
+// 连接PetAdoption合约
+export const connectPetAdoptionContract = createAsyncThunk(
+  'web3/connectPetAdoptionContract',
+  async (contractAddress: string, { getState }) => {
+    const state = getState() as any;
+    const { web3 } = state.web3;
+    
+    if (!web3) {
+      throw new Error('Web3未初始化');
+    }
+    
+    try {
+      const contract = new web3.eth.Contract(petAdoptionABI as any, contractAddress);
+      return contract;
+    } catch (error) {
+      throw new Error('无法连接到PetAdoption合约');
+    }
+  }
+);
+
 // 获取账户余额
 export const getBalance = createAsyncThunk(
   'web3/getBalance',
@@ -95,13 +138,37 @@ export const getBalance = createAsyncThunk(
   }
 );
 
+// 获取PetCoin余额
+export const getPetCoinBalance = createAsyncThunk(
+  'web3/getPetCoinBalance',
+  async (_, { getState }) => {
+    const state = getState() as any;
+    const { account, petCoinContract } = state.web3;
+    
+    if (!petCoinContract || !account) {
+      return '0';
+    }
+    
+    try {
+      const balance = await petCoinContract.methods.getBalance(account).call();
+      return balance.toString();
+    } catch (error) {
+      console.error('获取PetCoin余额失败:', error);
+      return '0';
+    }
+  }
+);
+
 // 初始状态
 interface Web3State {
   web3: Web3 | null;
   account: string | null;
   networkId: number | null;
   contract: any | null;
+  petCoinContract: any | null;
+  petAdoptionContract: any | null;
   balance: string;
+  petCoinBalance: string;
   loading: boolean;
   error: string | null;
 }
@@ -111,7 +178,10 @@ const initialState: Web3State = {
   account: null,
   networkId: null,
   contract: null,
+  petCoinContract: null,
+  petAdoptionContract: null,
   balance: '0',
+  petCoinBalance: '0',
   loading: false,
   error: null
 };
@@ -180,6 +250,42 @@ const web3Slice = createSlice({
       .addCase(getBalance.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || '获取余额失败';
+      })
+      .addCase(connectPetCoinContract.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(connectPetCoinContract.fulfilled, (state, action) => {
+        state.loading = false;
+        state.petCoinContract = action.payload;
+      })
+      .addCase(connectPetCoinContract.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || '连接PetCoin合约失败';
+      })
+      .addCase(connectPetAdoptionContract.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(connectPetAdoptionContract.fulfilled, (state, action) => {
+        state.loading = false;
+        state.petAdoptionContract = action.payload;
+      })
+      .addCase(connectPetAdoptionContract.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || '连接PetAdoption合约失败';
+      })
+      .addCase(getPetCoinBalance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPetCoinBalance.fulfilled, (state, action) => {
+        state.loading = false;
+        state.petCoinBalance = action.payload;
+      })
+      .addCase(getPetCoinBalance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || '获取PetCoin余额失败';
       });
   }
 });
