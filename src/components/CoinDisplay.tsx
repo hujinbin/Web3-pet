@@ -3,8 +3,7 @@ import { Typography, Badge, Tooltip, Popover, List, Spin } from 'antd';
 import { GoldOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import Web3 from 'web3';
-import { RootState } from '../store/store';
-import { updateBalance } from '../store/web3Slice';
+import type { RootState } from '../store/store';
 
 const { Text } = Typography;
 

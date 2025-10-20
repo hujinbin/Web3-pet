@@ -431,27 +431,3 @@ const BreedPetPage: React.FC<BreedPetPageProps> = () => {
 };
 
 export default BreedPetPage;
-      {selectedPet1 && selectedPet2 && (
-        <div className="mt-8 text-center">
-          <button 
-            onClick={handleBreedSubmit} 
-            className="btn-secondary px-8 py-3 text-lg"
-            disabled={breeding}
-          >
-            {breeding ? (
-              <>
-                <i className="fa fa-spinner fa-spin mr-2"></i>繁殖中...
-              </>
-            ) : (
-              <>
-                <i className="fa fa-heart mr-2"></i>开始繁殖
-              </>
-            )}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default BreedPetPage;
