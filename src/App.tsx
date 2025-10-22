@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import PetDetail from './pages/PetDetail';
 import BreedPet from './pages/BreedPet';
 import AdoptPet from './pages/AdoptPet';
+import LoginRegister from './pages/LoginRegister';
+import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Layout, Spin, Alert, ConfigProvider, theme } from 'antd';
@@ -75,6 +77,8 @@ function App() {
               <Route path="/pet/:id" element={<PetDetail />} />
               <Route path="/breed" element={<BreedPet />} />
               <Route path="/adopt" element={<AdoptPet />} />
+              <Route path="/login" element={<LoginRegister />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </Content>
 

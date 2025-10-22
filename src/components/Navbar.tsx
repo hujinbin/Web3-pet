@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { Layout, Menu, Button, Typography, Avatar, Drawer, Space, Grid } from 'antd';
 import { HomeOutlined, HeartOutlined, ShoppingOutlined, UserOutlined, MenuOutlined, WalletOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const { account } = useSelector((state: RootState) => state.web3);
@@ -12,6 +13,7 @@ const Navbar: React.FC = () => {
   const { Title, Text } = Typography;
   const { useBreakpoint } = Grid;  
   const screens = useBreakpoint();
+  const navigate = useNavigate();
 
   const showDrawer = () => {
     setVisible(true);
@@ -61,13 +63,16 @@ const Navbar: React.FC = () => {
         
         <Space size={16}>
           {account ? (
-            <Button type="text" icon={<UserOutlined />} style={{ display: 'flex', alignItems: 'center' }}>
-              <Text ellipsis style={{ maxWidth: 120 }}>{account}</Text>
-            </Button>
+            <>
+              <Button type="text" icon={<UserOutlined />} style={{ display: 'flex', alignItems: 'center' }} onClick={() => navigate('/profile')}>
+                <Text ellipsis style={{ maxWidth: 120 }}>{account}</Text>
+                <span style={{ marginLeft: 8 }}>个人中心</span>
+              </Button>
+            </>
           ) : (
-            <Link to="/connect">
-              <Button type="primary" icon={<WalletOutlined />}>连接钱包</Button>
-            </Link>
+            <Button type="primary" icon={<UserOutlined />} onClick={() => navigate('/login')}>
+              登录/注册
+            </Button>
           )}
           
           {!screens.md && (
