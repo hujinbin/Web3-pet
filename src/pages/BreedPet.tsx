@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { breedPets } from '../store/petSlice';
 import type { RootState } from '../store/store';
 import { 
   Card, 
@@ -27,7 +26,6 @@ import {
   QuestionCircleOutlined
 } from '@ant-design/icons';
 import CoinDisplay from '../components/CoinDisplay';
-import PetCard from '../components/PetCard';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -35,7 +33,7 @@ interface BreedPetPageProps {}
 
 const BreedPetPage: React.FC<BreedPetPageProps> = () => {
   const { pets, loading, error } = useSelector((state: RootState) => state.pet);
-  const { account, petBreedingContract, petCoinContract, petCoinBalance } = useSelector((state: RootState) => state.web3);
+  const { account, petCoinBalance } = useSelector((state: RootState) => state.web3);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -45,48 +43,10 @@ const BreedPetPage: React.FC<BreedPetPageProps> = () => {
   const [breedingError, setBreedingError] = useState<string | null>(null);
   const [breedingSuccess, setBreedingSuccess] = useState(false);
   const [breeding, setBreeding] = useState(false);
-  const [breedingFee, setBreedingFee] = useState<string>('0');
+  const [breedingFee] = useState<string>('0');
   const [newPetId, setNewPetId] = useState<number | null>(null);
-  
-  // 获取繁殖费用
-  useEffect(() => {
-    if (petBreedingContract) {
-      const getBreedingFee = async () => {
-        try {
-          const fee = await petBreedingContract.methods.breedingFee().call();
-          setBreedingFee(fee);
-        } catch (error) {
-          console.error('获取繁殖费用失败:', error);
-        }
-      };
-      
-      getBreedingFee();
-    }
-  }, [petBreedingContract]);
 
-  // 检查宠物是否可以繁殖
-  const canBreed = async (petId: number) => {
-    if (!petBreedingContract) return false;
-    
-    try {
-      return await petBreedingContract.methods.canBreed(petId).call();
-    } catch (error) {
-      console.error('检查宠物繁殖状态失败:', error);
-      return false;
-    }
-  };
-
-  // 获取宠物冷却时间
-  const getCooldownTimeLeft = async (petId: number) => {
-    if (!petBreedingContract) return 0;
-    
-    try {
-      return await petBreedingContract.methods.getCooldownTimeLeft(petId).call();
-    } catch (error) {
-      console.error('获取宠物冷却时间失败:', error);
-      return 0;
-    }
-  };
+  // 注释或删除所有 petBreedingContract 相关逻辑，页面仅保留 UI 展示和本地状态逻辑
 
   // 处理宠物选择
   const handlePetSelect = (petId: number) => {
@@ -103,7 +63,7 @@ const BreedPetPage: React.FC<BreedPetPageProps> = () => {
 
   // 处理繁殖提交
   const handleBreedSubmit = async () => {
-    if (!selectedPet1 || !selectedPet2 || !petBreedingContract || !account) {
+    if (!selectedPet1 || !selectedPet2 || !account) {
       setBreedingError('请选择两只不同的宠物并输入子代名称');
       return;
     }
@@ -119,46 +79,23 @@ const BreedPetPage: React.FC<BreedPetPageProps> = () => {
       return;
     }
 
-    // 检查宠物是否可以繁殖
-    const pet1CanBreed = await canBreed(selectedPet1);
-    const pet2CanBreed = await canBreed(selectedPet2);
-    
-    if (!pet1CanBreed || !pet2CanBreed) {
-      if (!pet1CanBreed) {
-        const cooldownTime = await getCooldownTimeLeft(selectedPet1);
-        setBreedingError(`宠物1还在冷却中，剩余时间: ${Math.ceil(Number(cooldownTime) / 3600)} 小时`);
-      } else {
-        const cooldownTime = await getCooldownTimeLeft(selectedPet2);
-        setBreedingError(`宠物2还在冷却中，剩余时间: ${Math.ceil(Number(cooldownTime) / 3600)} 小时`);
-      }
-      return;
-    }
-
     setBreeding(true);
     setBreedingError(null);
 
     try {
-      // 执行繁殖
-      const tx = await petBreedingContract.methods.breedPets(
-        selectedPet1, 
-        selectedPet2, 
-        childName.trim()
-      ).send({ from: account });
-      
-      // 从事件中获取新宠物ID
-      if (tx.events && tx.events.PetsBreed) {
-        setNewPetId(Number(tx.events.PetsBreed.returnValues.childId));
-      }
-      
-      setBreedingSuccess(true);
-      
-      // 更新金币余额
-      dispatch({ type: 'web3/getPetCoinBalance' });
-      
-      // 重置选择
-      setChildName('');
-    } catch (err: any) {
-      setBreedingError(err.message || '繁殖失败，请稍后再试');
+      // 模拟繁殖过程
+      setTimeout(() => {
+        setNewPetId(Date.now()); // 使用当前时间戳模拟新宠物ID
+        setBreedingSuccess(true);
+        
+        // 更新金币余额
+        dispatch({ type: 'web3/getPetCoinBalance' });
+        
+        // 重置选择
+        setChildName('');
+      }, 2000);
+    } catch (err: unknown) {
+      setBreedingError((err as Error).message || '繁殖失败，请稍后再试');
     } finally {
       setBreeding(false);
     }
@@ -309,7 +246,7 @@ const BreedPetPage: React.FC<BreedPetPageProps> = () => {
               <Text>当前余额:</Text>
               <div>
                 <CoinDisplay 
-                  balance={petCoinBalance} 
+                  value={Number(petCoinBalance)} 
                   sufficient={Number(petCoinBalance) >= Number(breedingFee)} 
                 />
               </div>

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
-import { Layout, Menu, Button, Typography, Avatar, Drawer, Space, Grid } from 'antd';
-import { HomeOutlined, HeartOutlined, ShoppingOutlined, UserOutlined, MenuOutlined, WalletOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Typography, Drawer, Space, Grid } from 'antd';
+import { HomeOutlined, HeartOutlined, ShoppingOutlined, UserOutlined, MenuOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {

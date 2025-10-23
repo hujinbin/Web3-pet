@@ -13,11 +13,6 @@ const LoginRegister: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 密码哈希函数（实际项目建议用更安全的算法）
-  const hashPassword = (pwd: string) => {
-    return window.btoa(pwd); // 简单base64，实际请用sha256/bcrypt
-  };
-
   // 注册
   const handleRegister = async () => {
     if (!username || !password) {

@@ -51,7 +51,7 @@ export const getPetInfo = createAsyncThunk(
 export const fetchUserPets = createAsyncThunk(
   'pet/fetchUserPets',
   async (_, { getState }) => {
-    const state = getState() as any;
+    const state = getState() as { web3: any };
     const { contract, account } = state.web3;
     
     if (!contract || !account) {
@@ -98,7 +98,7 @@ export const fetchUserPets = createAsyncThunk(
 export const adoptPet = createAsyncThunk(
   'pet/adoptPet',
   async ({ name, petType }: { name: string, petType: string }, { getState, dispatch }) => {
-    const state = getState() as any;
+    const state = getState() as { web3: any };
     const { account, petAdoptionContract, petCoinContract } = state.web3;
     
     if (!petAdoptionContract || !account || !petCoinContract) {
@@ -139,7 +139,7 @@ export const adoptPet = createAsyncThunk(
 export const breedPets = createAsyncThunk(
   'pet/breedPets',
   async ({ petId1, petId2 }: { petId1: number, petId2: number }, { getState, dispatch }) => {
-    const state = getState() as any;
+    const state = getState() as { web3: any };
     const { contract, account, web3 } = state.web3;
     
     if (!contract || !account || !web3) {
@@ -224,7 +224,7 @@ const petSlice = createSlice({
         state.adopting = true;
         state.error = null;
       })
-      .addCase(adoptPet.fulfilled, (state, action) => {
+      .addCase(adoptPet.fulfilled, (state) => {
         state.adopting = false;
       })
       .addCase(adoptPet.rejected, (state, action) => {
@@ -235,7 +235,7 @@ const petSlice = createSlice({
         state.breeding = true;
         state.error = null;
       })
-      .addCase(breedPets.fulfilled, (state, action) => {
+      .addCase(breedPets.fulfilled, (state) => {
         state.breeding = false;
       })
       .addCase(breedPets.rejected, (state, action) => {

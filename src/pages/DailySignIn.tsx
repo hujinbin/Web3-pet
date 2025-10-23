@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Button, Typography, Row, Col, Statistic, Alert, Spin, Calendar, Badge, Modal, Result } from 'antd';
 import { CheckCircleOutlined, CalendarOutlined, FireOutlined, GiftOutlined, GoldOutlined, TrophyOutlined } from '@ant-design/icons';
 import type { RootState } from '../store/store';
-import CoinDisplay from '../components/CoinDisplay';
-import moment from 'moment';
+// moment 未安装请运行 npm install moment
+import dayjs, { Dayjs } from 'dayjs';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
-interface DailySignInProps {}
+interface DailySignInProps { [key: string]: unknown }
 
 const DailySignIn: React.FC<DailySignInProps> = () => {
   const dispatch = useDispatch();
-  const { account, petCoinContract, petCoinBalance } = useSelector((state: RootState) => state.web3);
+  const { account, petCoinContract } = useSelector((state: RootState) => state.web3);
   
   const [loading, setLoading] = useState(false);
   const [canSignIn, setCanSignIn] = useState(false);
@@ -27,47 +27,36 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
   const [maxStreakBonus, setMaxStreakBonus] = useState(50);
   
   // 获取签到信息
-  useEffect(() => {
-    if (petCoinContract && account) {
-      fetchSignInInfo();
-      checkCanSignIn();
-      fetchRewardInfo();
-    }
-  }, [petCoinContract, account]);
-  
-  // 获取签到信息
-  const fetchSignInInfo = async () => {
+  const fetchSignInInfo = useCallback(async () => {
     try {
       const signInInfo = await petCoinContract.methods.getSignInInfo(account).call();
       setLastSignIn(Number(signInInfo.lastSignIn));
       setStreak(Number(signInInfo.streak));
     } catch (error) {
-      console.error('获取签到信息失败:', error);
+      setError((error as Error).message || '获取签到信息失败');
     }
-  };
-  
-  // 检查今天是否可以签到
-  const checkCanSignIn = async () => {
+  }, [petCoinContract, account]);
+
+  const checkCanSignIn = useCallback(async () => {
     try {
       const canSignInToday = await petCoinContract.methods.canSignInToday(account).call();
       setCanSignIn(canSignInToday);
     } catch (error) {
-      console.error('检查签到状态失败:', error);
+      setError((error as Error).message || '检查签到状态失败');
     }
-  };
-  
-  // 获取奖励信息
-  const fetchRewardInfo = async () => {
+  }, [petCoinContract, account]);
+
+  const fetchRewardInfo = useCallback(async () => {
     try {
       const baseSignInReward = await petCoinContract.methods.baseSignInReward().call();
       const maxBonus = await petCoinContract.methods.maxStreakBonus().call();
       setBaseReward(Number(baseSignInReward));
       setMaxStreakBonus(Number(maxBonus));
     } catch (error) {
-      console.error('获取奖励信息失败:', error);
+      setError((error as Error).message || '获取奖励信息失败');
     }
-  };
-  
+  }, [petCoinContract]);
+
   // 计算当前可获得的奖励
   const calculateReward = () => {
     const streakBonus = Math.min((streak) * 2, maxStreakBonus);
@@ -85,7 +74,7 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
     setError('');
     
     try {
-      const tx = await petCoinContract.methods.signIn().send({ from: account });
+      await petCoinContract.methods.signIn().send({ from: account });
       const reward = calculateReward();
       setSignInReward(reward);
       setSignInModalVisible(true);
@@ -96,25 +85,21 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
       
       // 更新金币余额
       dispatch({ type: 'web3/getPetCoinBalance' });
-    } catch (error: any) {
-      setError(error.message || '签到失败，请稍后再试');
+    } catch (error: unknown) {
+      setError((error as Error).message || '签到失败，请稍后再试');
     } finally {
       setLoading(false);
     }
   };
   
   // 日历单元格渲染
-  const dateCellRender = (date: moment.Moment) => {
-    const day = date.date();
-    const month = date.month();
-    const year = date.year();
-    
+  const dateCellRender = (date: Dayjs) => {
     // 今天日期
-    const today = moment();
+    const today = dayjs();
     const isToday = date.isSame(today, 'day');
     
     // 上次签到日期
-    const lastSignInDate = moment.unix(lastSignIn);
+    const lastSignInDate = dayjs.unix(lastSignIn);
     const isLastSignIn = date.isSame(lastSignInDate, 'day');
     
     // 判断是否是过去的日期
@@ -122,7 +107,7 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
     
     // 判断是否是连续签到的日期
     const isInStreak = isPast && 
-      date.isAfter(moment().subtract(streak, 'days'), 'day') && 
+      date.isAfter(dayjs().subtract(streak, 'days'), 'day') && 
       !date.isAfter(lastSignInDate, 'day');
     
     if (isLastSignIn) {
@@ -135,6 +120,14 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
     
     return null;
   };
+  
+  useEffect(() => {
+    if (petCoinContract && account) {
+      checkCanSignIn();
+      fetchRewardInfo();
+      fetchSignInInfo();
+    }
+  }, [petCoinContract, account, checkCanSignIn, fetchRewardInfo, fetchSignInInfo]);
   
   return (
     <div style={{ padding: '24px' }}>
@@ -258,3 +251,6 @@ const DailySignIn: React.FC<DailySignInProps> = () => {
 };
 
 export default DailySignIn;
+
+// moment 相关代码如未安装请手动安装
+// npm install moment

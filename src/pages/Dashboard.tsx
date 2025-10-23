@@ -6,12 +6,12 @@ import type { RootState } from '../store/store';
 import PetCard from '../components/PetCard';
 import { Link } from 'react-router-dom';
 import { Row, Col, Typography, Button, Card, Empty, Spin, Alert, Statistic, Carousel, Divider, Badge, Space, Tag } from 'antd';
-import { PlusOutlined, HeartOutlined, TrophyOutlined, FireOutlined, RocketOutlined, ThunderboltOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { PlusOutlined, HeartOutlined, TrophyOutlined, FireOutlined, ThunderboltOutlined, ShoppingOutlined } from '@ant-design/icons';
 
 // 合约地址（需要替换为实际部署的合约地址）
 const CONTRACT_ADDRESS = '0xYourContractAddress';
 
-interface DashboardPageProps {}
+interface DashboardPageProps { [key: string]: unknown }
 
 const DashboardPage: React.FC<DashboardPageProps> = () => {
   const { pets, loading, error } = useSelector((state: RootState) => state.pet);
@@ -22,12 +22,12 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
   useEffect(() => {
     // 连接合约
     if (account && !contract) {
-      dispatch(connectContract(CONTRACT_ADDRESS));
+      dispatch<any>(connectContract(CONTRACT_ADDRESS));
     }
     
     // 获取宠物列表
     if (contract && account) {
-      dispatch(fetchUserPets());
+      dispatch<any>(fetchUserPets());
     }
   }, [contract, account, dispatch]);
 

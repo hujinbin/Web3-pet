@@ -1,51 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  Card, 
   Button, 
   Typography, 
-  Row, 
-  Col, 
-  Input, 
-  Alert, 
-  Spin, 
-  Divider,
   Collapse,
   Form,
   Select,
   Space,
-  Result
+  Result,
+  Alert,
+  Input,
+  Divider
 } from 'antd';
 import { 
-  CheckCircleOutlined, 
-  CloseCircleOutlined,
   BugOutlined,
   RocketOutlined
 } from '@ant-design/icons';
 import type { RootState } from '../store/store';
-import { 
-  testConnection, 
-  testContracts, 
-  testSignIn, 
-  testAdoption, 
-  testBreeding 
-} from '../utils/testFunctions';
+import * as testFunctions from '../utils/testFunctions';
 
 const { Title, Paragraph, Text } = Typography;
 const { Panel } = Collapse;
 const { Option } = Select;
 
+// 定义 TestResult 类型
 interface TestResult {
   success: boolean;
-  message: string;
-  [key: string]: any;
+  message?: string;
+  balance?: string;
+  consecutiveDays?: string;
+  petId?: string;
+  petName?: string;
+  petType?: string;
+  childId?: string;
+  childName?: string;
+  petCoin?: { success: boolean; message: string };
+  petAdoption?: { success: boolean; message: string };
+  pet?: { success: boolean; message: string };
+  petBreeding?: { success: boolean; message: string };
+}
+
+// Web3State 类型补充 petBreedingContract 属性
+interface Web3State {
+  petBreedingContract?: unknown;
+  // ...其他属性...
 }
 
 const TestPage: React.FC = () => {
   const dispatch = useDispatch();
   const { 
     account, 
-    contract, 
     petCoinContract, 
     petAdoptionContract, 
     petBreedingContract,
@@ -54,7 +58,7 @@ const TestPage: React.FC = () => {
   const { pets } = useSelector((state: RootState) => state.pet);
 
   const [connectionResult, setConnectionResult] = useState<TestResult | null>(null);
-  const [contractsResult, setContractsResult] = useState<any | null>(null);
+  const [contractsResult, setContractsResult] = useState<TestResult | null>(null);
   const [signInResult, setSignInResult] = useState<TestResult | null>(null);
   const [adoptionResult, setAdoptionResult] = useState<TestResult | null>(null);
   const [breedingResult, setBreedingResult] = useState<TestResult | null>(null);
@@ -78,7 +82,7 @@ const TestPage: React.FC = () => {
   const handleTestConnection = async () => {
     setLoading(prev => ({ ...prev, connection: true }));
     try {
-      const result = await testConnection();
+      const result = await testFunctions.testConnection();
       setConnectionResult(result);
       
       if (result.success) {
@@ -99,7 +103,7 @@ const TestPage: React.FC = () => {
   const handleTestContracts = async () => {
     setLoading(prev => ({ ...prev, contracts: true }));
     try {
-      const result = await testContracts(contractAddresses);
+      const result = await testFunctions.testContracts(contractAddresses);
       setContractsResult(result);
       
       if (result.petCoin?.success) {
@@ -144,7 +148,7 @@ const TestPage: React.FC = () => {
     
     setLoading(prev => ({ ...prev, signIn: true }));
     try {
-      const result = await testSignIn(petCoinContract, account);
+      const result = await testFunctions.testSignIn(petCoinContract, account);
       setSignInResult(result);
       
       if (result.success) {
@@ -173,7 +177,7 @@ const TestPage: React.FC = () => {
     
     setLoading(prev => ({ ...prev, adoption: true }));
     try {
-      const result = await testAdoption(
+      const result = await testFunctions.testAdoption(
         petAdoptionContract, 
         petCoinContract, 
         account, 
@@ -209,7 +213,7 @@ const TestPage: React.FC = () => {
     
     setLoading(prev => ({ ...prev, breeding: true }));
     try {
-      const result = await testBreeding(
+      const result = await testFunctions.testBreeding(
         petBreedingContract, 
         petCoinContract, 
         account, 
@@ -302,7 +306,7 @@ const TestPage: React.FC = () => {
               <Form.Item label="Pet合约地址">
                 <Input 
                   value={contractAddresses.petAddress}
-                  onChange={e => setContractAddresses(prev => ({ ...prev, petAddress: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setContractAddresses(prev => ({ ...prev, petAddress: e.target.value }))}
                   placeholder="输入Pet合约地址"
                 />
               </Form.Item>

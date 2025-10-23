@@ -13,15 +13,10 @@ import {
   List, 
   Row, 
   Col, 
-  Select, 
-  Avatar, 
-  Space,
-  Divider,
-  Steps,
   Radio,
-  Modal,
   Tooltip,
-  Badge
+  Steps,
+  Avatar
 } from 'antd';
 import { 
   HeartOutlined, 
@@ -33,13 +28,12 @@ import {
   GoldOutlined,
   QuestionCircleOutlined
 } from '@ant-design/icons';
-import CoinDisplay from '../components/CoinDisplay';
 
-interface AdoptPetPageProps {}
+interface AdoptPetPageProps { [key: string]: unknown }
 
 const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
   const { loading, error, adopting } = useSelector((state: RootState) => state.pet);
-  const { account, contract, petCoinContract, petCoinBalance } = useSelector((state: RootState) => state.web3);
+  const { account, contract, petCoinBalance } = useSelector((state: RootState) => state.web3);
   const dispatch = useDispatch();
   
   const [petName, setPetName] = useState('');
@@ -85,7 +79,7 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
     }
 
     try {
-      await dispatch(adoptPet({ name: petName.trim(), petType }));
+      await dispatch<any>(adoptPet({ name: petName.trim(), petType }));
       setAdoptionSuccess(true);
       setPetName('');
       form.resetFields();
@@ -94,7 +88,7 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
       setTimeout(() => {
         window.location.href = '/';
       }, 3000);
-    } catch (err: any) {
+    } catch (err) {
       // 错误处理已在redux中完成
     }
   };

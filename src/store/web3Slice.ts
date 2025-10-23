@@ -3,7 +3,6 @@ import Web3 from 'web3';
 import petABI from '../abis/PetABI.json';
 import petCoinABI from '../abis/PetCoinABI.json';
 import petAdoptionABI from '../abis/PetAdoptionABI.json';
-import petBreedingABI from '../abis/PetBreedingABI.json';
 
 // 初始化web3
 let web3: Web3 | null = null;
@@ -11,12 +10,12 @@ let web3: Web3 | null = null;
 // 检查是否有可用的web3提供程序
 export const checkWeb3 = createAsyncThunk(
   'web3/checkWeb3',
-  async (_, { dispatch }) => {
-    if (window.ethereum) {
-      web3 = new Web3(window.ethereum);
+  async () => {
+    if ((window as any).ethereum) {
+      web3 = new Web3((window as any).ethereum);
       try {
         // 请求账户权限
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
         return {
           web3: web3,
           account: accounts[0],
@@ -25,9 +24,9 @@ export const checkWeb3 = createAsyncThunk(
       } catch (error) {
         throw new Error('用户拒绝了账户访问请求');
       }
-    } else if (window.web3) {
+    } else if ((window as any).web3) {
       // 老版本的MetaMask提供的web3
-      web3 = new Web3(window.web3.currentProvider);
+      web3 = new Web3((window as any).web3.currentProvider);
       const accounts = await web3.eth.getAccounts();
       return {
         web3: web3,
@@ -43,9 +42,8 @@ export const checkWeb3 = createAsyncThunk(
 // 获取用户账户
 export const getAccount = createAsyncThunk(
   'web3/getAccount',
-  async (_, { dispatch }) => {
+  async () => {
     if (!web3) {
-      dispatch(checkWeb3());
       return null;
     }
     
@@ -207,9 +205,9 @@ const web3Slice = createSlice({
       })
       .addCase(checkWeb3.fulfilled, (state, action) => {
         state.loading = false;
-        state.web3 = action.payload.web3;
+        state.web3 = action.payload.web3 as Web3 | null;
         state.account = action.payload.account;
-        state.networkId = action.payload.networkId;
+        state.networkId = Number(action.payload.networkId);
       })
       .addCase(checkWeb3.rejected, (state, action) => {
         state.loading = false;

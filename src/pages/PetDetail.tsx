@@ -7,9 +7,11 @@ import Footer from '../components/Footer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import type { RootState } from '../store/store';
+import type { AbiItem } from 'web3-utils';
+import type { Contract } from 'web3-eth-contract';
 
 interface PetDetailPageProps {
-  contract: any; // 使用web3合约类型
+  contract: Contract<AbiItem[]>;
 }
 
 const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
@@ -27,7 +29,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
 
   useEffect(() => {
     if (contract && petId) {
-      dispatch(getPetInfo({ contract, petId: parseInt(petId) }));
+      dispatch<any>(getPetInfo({ contract, petId: parseInt(petId) }));
     }
   }, [contract, petId, dispatch]);
 
@@ -76,7 +78,7 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       setTransferSuccess('');
       
       // 调用智能合约的transferFrom方法
-      const tx = await contract.methods.transferFrom(
+      await contract.methods.transferFrom(
         account,
         transferAddress,
         parseInt(petId)
@@ -88,12 +90,12 @@ const PetDetail: React.FC<PetDetailPageProps> = ({ contract }) => {
       setTimeout(() => {
         navigate('/pets');
       }, 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('转移失败:', error);
-      if (error.message && error.message.includes('User denied transaction signature')) {
+      if ((error as Error).message && (error as Error).message.includes('User denied transaction signature')) {
         setTransferError('用户拒绝了交易签名');
       } else {
-        setTransferError('转移失败: ' + error.message);
+        setTransferError('转移失败: ' + (error as Error).message);
       }
     } finally {
       setIsTransferring(false);

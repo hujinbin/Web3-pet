@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Button, Input, message, Spin } from 'antd';
+import { Card, Avatar, Button, Input, message } from 'antd';
 import { UserOutlined, EditOutlined } from '@ant-design/icons';
 // import { userContract } from '../web3/userContract';
 
