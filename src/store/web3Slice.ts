@@ -205,7 +205,7 @@ const web3Slice = createSlice({
       })
       .addCase(checkWeb3.fulfilled, (state, action) => {
         state.loading = false;
-        state.web3 = action.payload.web3 as Web3 | null;
+        state.web3 = { ...action.payload.web3 };
         state.account = action.payload.account;
         state.networkId = Number(action.payload.networkId);
       })

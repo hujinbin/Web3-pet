@@ -40,12 +40,6 @@ interface TestResult {
   petBreeding?: { success: boolean; message: string };
 }
 
-// Web3State 类型补充 petBreedingContract 属性
-interface Web3State {
-  petBreedingContract?: unknown;
-  // ...其他属性...
-}
-
 const TestPage: React.FC = () => {
   const dispatch = useDispatch();
   const { 
@@ -104,7 +98,7 @@ const TestPage: React.FC = () => {
     setLoading(prev => ({ ...prev, contracts: true }));
     try {
       const result = await testFunctions.testContracts(contractAddresses);
-      setContractsResult(result);
+      setContractsResult(result as TestResult);
       
       if (result.petCoin?.success) {
         // 更新Redux状态
@@ -149,7 +143,7 @@ const TestPage: React.FC = () => {
     setLoading(prev => ({ ...prev, signIn: true }));
     try {
       const result = await testFunctions.testSignIn(petCoinContract, account);
-      setSignInResult(result);
+      setSignInResult(result as TestResult);
       
       if (result.success) {
         // 更新Redux状态
@@ -184,7 +178,7 @@ const TestPage: React.FC = () => {
         values.petName, 
         values.petType
       );
-      setAdoptionResult(result);
+      setAdoptionResult(result as TestResult);
       
       if (result.success) {
         // 更新Redux状态
@@ -221,7 +215,7 @@ const TestPage: React.FC = () => {
         values.petId2, 
         values.childName
       );
-      setBreedingResult(result);
+      setBreedingResult(result as TestResult);
       
       if (result.success) {
         // 更新Redux状态

@@ -10,10 +10,15 @@ import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Layout, Spin, Alert, ConfigProvider, theme } from 'antd';
+import type { Contract } from 'web3-eth-contract';
+import type { AbiItem } from 'web3-utils';
 
 function App() {
   const { loading, error } = useSelector((state: RootState) => state.web3);
   const { Content } = Layout;
+
+  // mock 合约对象
+  const mockContract = {} as unknown as Contract<AbiItem[]>;
 
   return (
     <ConfigProvider
@@ -73,7 +78,7 @@ function App() {
           }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/pet/:id" element={<PetDetail contract={null} />} />
+              <Route path="/pet/:id" element={<PetDetail contract={mockContract} />} />
               <Route path="/breed" element={<BreedPet />} />
               <Route path="/adopt" element={<AdoptPet />} />
               <Route path="/login" element={<LoginRegister />} />
