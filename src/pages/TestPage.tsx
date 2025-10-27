@@ -46,7 +46,6 @@ const TestPage: React.FC = () => {
     account, 
     petCoinContract, 
     petAdoptionContract, 
-    petBreedingContract,
     petCoinBalance
   } = useSelector((state: RootState) => state.web3);
   const { pets } = useSelector((state: RootState) => state.pet);
@@ -77,9 +76,9 @@ const TestPage: React.FC = () => {
     setLoading(prev => ({ ...prev, connection: true }));
     try {
       const result = await testFunctions.testConnection();
-      setConnectionResult(result);
+      setConnectionResult(result as TestResult);
       
-      if (result.success) {
+      if ((result as TestResult).success) {
         // 更新Redux状态
         dispatch({ type: 'web3/checkAccount' });
       }
@@ -100,17 +99,17 @@ const TestPage: React.FC = () => {
       const result = await testFunctions.testContracts(contractAddresses);
       setContractsResult(result as TestResult);
       
-      if (result.petCoin?.success) {
+      if ((result as TestResult).petCoin?.success) {
         // 更新Redux状态
         dispatch({ type: 'web3/connectPetCoinContract', payload: contractAddresses.petCoinAddress });
         dispatch({ type: 'web3/getPetCoinBalance' });
       }
       
-      if (result.petAdoption?.success) {
+      if ((result as TestResult).petAdoption?.success) {
         dispatch({ type: 'web3/connectPetAdoptionContract', payload: contractAddresses.petAdoptionAddress });
       }
       
-      if (result.pet?.success && result.petBreeding?.success) {
+      if ((result as TestResult).pet?.success && (result as TestResult).petBreeding?.success) {
         dispatch({ type: 'web3/connectContract', payload: contractAddresses.petAddress });
         dispatch({ type: 'pet/fetchPets' });
       }
@@ -145,7 +144,7 @@ const TestPage: React.FC = () => {
       const result = await testFunctions.testSignIn(petCoinContract, account);
       setSignInResult(result as TestResult);
       
-      if (result.success) {
+      if ((result as TestResult).success) {
         // 更新Redux状态
         dispatch({ type: 'web3/getPetCoinBalance' });
       }
@@ -180,7 +179,7 @@ const TestPage: React.FC = () => {
       );
       setAdoptionResult(result as TestResult);
       
-      if (result.success) {
+      if ((result as TestResult).success) {
         // 更新Redux状态
         dispatch({ type: 'web3/getPetCoinBalance' });
         dispatch({ type: 'pet/fetchPets' });
@@ -197,6 +196,7 @@ const TestPage: React.FC = () => {
 
   // 测试繁殖
   const handleTestBreeding = async (values: { petId1: number, petId2: number, childName: string }) => {
+    let petBreedingContract: any;
     if (!petBreedingContract || !petCoinContract || !account) {
       setBreedingResult({
         success: false,
@@ -217,7 +217,7 @@ const TestPage: React.FC = () => {
       );
       setBreedingResult(result as TestResult);
       
-      if (result.success) {
+      if ((result as TestResult).success) {
         // 更新Redux状态
         dispatch({ type: 'web3/getPetCoinBalance' });
         dispatch({ type: 'pet/fetchPets' });
@@ -482,7 +482,7 @@ const TestPage: React.FC = () => {
                   type="primary" 
                   htmlType="submit"
                   loading={loading.breeding}
-                  disabled={!petBreedingContract || !petCoinContract || !account}
+                  disabled={!petCoinContract || !account}
                 >
                   测试繁殖
                 </Button>
