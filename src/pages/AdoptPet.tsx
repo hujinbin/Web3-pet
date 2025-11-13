@@ -345,11 +345,9 @@ const AdoptPetPage: React.FC<AdoptPetPageProps> = () => {
             <List
               size="small"
               dataSource={[
-                '每次领养需要支付少量ETH作为gas费用',
                 '宠物名字一旦确定无法修改，请谨慎选择',
                 '每个宠物都有独特的DNA和属性',
                 '宠物可以通过繁殖产生后代',
-                '请确保钱包中有足够的ETH余额',
                 '领养成功后，宠物将立即出现在你的收藏中'
               ]}
               renderItem={(item, index) => (

@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from './store/store';
 import Dashboard from './pages/Dashboard';
+import Pets from './pages/Pets';
+import Marketplace from './pages/Marketplace';
 import PetDetail from './pages/PetDetail';
 import BreedPet from './pages/BreedPet';
 import AdoptPet from './pages/AdoptPet';
@@ -78,6 +80,8 @@ function App() {
           }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/pets" element={<Pets />} />
+              <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/pet/:id" element={<PetDetail contract={mockContract} />} />
               <Route path="/breed" element={<BreedPet />} />
               <Route path="/adopt" element={<AdoptPet />} />

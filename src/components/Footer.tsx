@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Layout, Row, Col, Typography, Space, Divider } from 'antd';
 import { TwitterOutlined, GithubOutlined, LinkedinOutlined, MediumOutlined } from '@ant-design/icons';
 
@@ -10,7 +11,9 @@ const Footer: React.FC = () => {
     <Footer style={{ background: '#001529', padding: '48px 24px 24px', marginTop: 60 }}>
       <Row gutter={[48, 32]}>
         <Col xs={24} sm={24} md={6} lg={6}>
-          <Title level={4} style={{ color: '#fff', marginBottom: 16 }}>Web3 Pet World</Title>
+          <Link to="/" style={{ color: 'inherit' }}>
+            <Title level={4} style={{ color: '#fff', marginBottom: 16 }}>Web3 Pet World</Title>
+          </Link>
           <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
             拥有、繁殖和饲养区块链上的独特数字宠物
           </Text>
@@ -61,7 +64,9 @@ const Footer: React.FC = () => {
       <Divider style={{ borderColor: 'rgba(255, 255, 255, 0.1)', margin: '24px 0' }} />
       
       <div style={{ textAlign: 'center' }}>
-        <Text style={{ color: 'rgba(255, 255, 255, 0.45)' }}>&copy; 2025 Web3 Pet World. 保留所有权利。</Text>
+        <Link to="/" style={{ color: 'rgba(255, 255, 255, 0.45)' }}>
+          <Text style={{ color: 'rgba(255, 255, 255, 0.45)' }}>&copy; 2025 Web3 Pet World. 保留所有权利。</Text>
+        </Link>
       </div>
     </Footer>
   );

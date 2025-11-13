@@ -45,7 +45,9 @@ const Navbar: React.FC = () => {
       justifyContent: 'space-between'
     }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Title level={3} style={{ margin: 0, color: '#1890ff' }}>Web3 Pet World</Title>
+        <Link to="/" style={{ display: 'inline-block' }}>
+          <Title level={3} style={{ margin: 0, color: '#1890ff' }}>Web3 Pet World</Title>
+        </Link>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center' }}>
